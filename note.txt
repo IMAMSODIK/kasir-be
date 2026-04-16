@@ -1,0 +1,4 @@
+TODO
+- download template checkout menu (done)
+- pindahkan template admin (dashboard) (done)
+- buat database
