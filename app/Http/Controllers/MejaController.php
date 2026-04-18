@@ -3,12 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Meja;
-use App\Http\Requests\StoreMejaRequest;
-use App\Http\Requests\UpdateMejaRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use ZipArchive;
 
 class MejaController extends Controller
 {
@@ -144,64 +142,102 @@ class MejaController extends Controller
         }
     }
 
-    // public function deactivate($id)
-    // {
-    //     try {
-    //         $user = User::findOrFail($id);
-    //         $user->status = false;
-    //         $user->save();
+    public function deactivate($id)
+    {
+        try {
+            $meja = Meja::findOrFail($id);
+            $meja->status = false;
+            $meja->save();
 
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Data berhasil dihapus'
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Gagal menghapus data'
-    //         ], 500);
-    //     }
-    // }
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil dihapus'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus data'
+            ], 500);
+        }
+    }
 
-    // public function restore($id)
-    // {
-    //     try {
-    //         $user = User::findOrFail($id);
-    //         $user->status = true;
-    //         $user->save();
+    public function restore($id)
+    {
+        try {
+            $meja = Meja::findOrFail($id);
+            $meja->status = true;
+            $meja->save();
 
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Data berhasil dikembalikan'
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Gagal mengembalikan data'
-    //         ], 500);
-    //     }
-    // }
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil dikembalikan'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengembalikan data'
+            ], 500);
+        }
+    }
 
-    // public function destroy($id)
-    // {
-    //     try {
-    //         $user = User::findOrFail($id);
+    public function destroy($id)
+    {
+        try {
+            $meja = Meja::findOrFail($id);
 
-    //         if ($user->foto && Storage::disk('public')->exists($user->foto)) {
-    //             Storage::disk('public')->delete($user->foto);
-    //         }
+            if ($meja->qrcode && Storage::disk('public')->exists($meja->qrcode)) {
+                Storage::disk('public')->delete($meja->qrcode);
+            }
 
-    //         $user->delete();
+            $meja->delete();
 
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Data berhasil dihapus'
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Gagal menghapus data'
-    //         ], 500);
-    //     }
-    // }
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil dihapus'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus data'
+            ], 500);
+        }
+    }
+
+    public function download()
+    {
+        try {
+            $mejas = Meja::whereNotNull('qrcode')->get();
+
+            if ($mejas->isEmpty()) {
+                return back()->with('error', 'Tidak ada QR Code untuk didownload');
+            }
+
+            $fileName = 'qrcode_meja_' . time() . '.zip';
+            $zipPath = storage_path('app/public/' . $fileName);
+
+            $zip = new ZipArchive;
+
+            if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+                throw new \Exception('Gagal membuat file ZIP');
+            }
+
+            foreach ($mejas as $meja) {
+                $filePath = storage_path('app/public/' . $meja->qrcode);
+
+                if (file_exists($filePath)) {
+                    $zip->addFile($filePath, $meja->nama_meja . '.png');
+                }
+            }
+
+            $zip->close();
+
+            if (!file_exists($zipPath)) {
+                throw new \Exception('ZIP tidak ditemukan');
+            }
+            
+            return response()->download($zipPath)->deleteFileAfterSend(true);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal download QR Code: ' . $e->getMessage());
+        }
+    }
 }

@@ -42,7 +42,7 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-                
+
                 @if (in_array(auth()->user()->role, ['admin', 'teacher']))
                     <li class="sidebar-main-title">
                         <div>
@@ -65,20 +65,17 @@
                     </a>
                 </li>
 
-                {{-- @if (in_array(auth()->user()->role, ['admin', 'teacher']))
-                    <li class="sidebar-list" style="cursor: pointer">
-                        <a class="sidebar-link sidebar-title">
-                            <i class="fa fa-user-graduate text-white"></i>
-                            <span class="">Students</span>
-                            <div class="according-menu"><i class="fa fa-angle-right"></i></div>
-                        </a>
-                        <ul class="sidebar-submenu" style="display: none;">
-                            <li><a href="/students"><i class="fa fa-list me-2"></i> All Students</a></li>
-                            <li><a href="/students-verification"><i class="fa fa-check-circle me-2"></i> Verification</a>
-                            </li>
-                        </ul>
-                    </li>
-                @endif --}}
+                <li class="sidebar-list" style="cursor: pointer">
+                    <a class="sidebar-link sidebar-title">
+                        <i class="fa fa-cubes text-white"></i>
+                        <span class="">Menu</span>
+                        <div class="according-menu"><i class="fa fa-angle-right"></i></div>
+                    </a>
+                    <ul class="sidebar-submenu" style="display: none;">
+                        <li><a href="/kategori-menu"><i class="fa fa-list me-2"></i> Kategori Menu</a></li>
+                        <li><a href="/daftar-menu"><i class="fa fa-cutlery me-2" aria-hidden="true"></i> Daftar Menu</a></li>
+                    </ul>
+                </li>
 
             </ul>
             <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>

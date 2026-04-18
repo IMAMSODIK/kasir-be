@@ -116,7 +116,6 @@ class UserController extends Controller
         try {
             $fotoPath = $user->foto;
 
-            // jika upload foto baru
             if ($request->hasFile('foto')) {
 
                 // hapus foto lama

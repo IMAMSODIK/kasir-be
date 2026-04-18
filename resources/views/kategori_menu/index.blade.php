@@ -1,54 +1,6 @@
 @extends('layouts.template')
 
 @section('own_style')
-    <style>
-        .qr-wrapper {
-            position: relative;
-            width: 100px;
-            height: 100px;
-            overflow: hidden;
-            border-radius: 10px;
-        }
-
-        .qr-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: all 0.3s ease;
-        }
-
-        /* tombol */
-        .qr-download {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.8);
-
-            background: rgba(0, 0, 0, 0.6);
-            color: #fff;
-            padding: 10px;
-            border-radius: 55%;
-
-            opacity: 0;
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-
-        /* 🔥 efek hover */
-        .qr-wrapper:hover .qr-img {
-            filter: blur(3px);
-            transform: scale(1.1);
-        }
-
-        .qr-wrapper:hover .qr-download {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        .qr-wrapper:hover {
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        }
-    </style>
 @endsection
 
 @section('content')
@@ -82,7 +34,7 @@
             <ul class="nav nav-tabs" id="myTab">
                 <li class="nav-item">
                     <button class="nav-link active" id="user-tab" data-bs-toggle="tab" data-bs-target="#user">
-                        Data Meja
+                        Data Kategori
                     </button>
                 </li>
                 <li class="nav-item">
@@ -99,9 +51,6 @@
                         <div class="row">
                             <div class="col-md-12 mb-2">
                                 <div class="d-flex justify-content-end">
-                                    <button class="btn btn-secondary" id="download-data" style="margin-right: 5px">
-                                        <i class="fa fa-download me-2" aria-hidden="true"></i> Download QRCode
-                                    </button>
                                     <button class="btn btn-primary" id="tambah-data" style="margin-right: 5px">
                                         <i class="fa fa-plus-circle me-2"></i> Tambah Data
                                     </button>
@@ -117,9 +66,9 @@
                                     <thead>
                                         <tr class="text-center">
                                             <th>No</th>
-                                            <th>Nomor Meja</th>
+                                            <th>Nama Kategori</th>
+                                            <th>Icon</th>
                                             <th>Status</th>
-                                            <th>QRCode</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
@@ -147,9 +96,9 @@
                                     <thead>
                                         <tr class="text-center">
                                             <th>No</th>
-                                            <th>Nomor Meja</th>
+                                            <th>Nama Kategori</th>
+                                            <th>Icon</th>
                                             <th>Status</th>
-                                            <th>QRCode</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
@@ -167,17 +116,26 @@
             <div class="modal-content">
                 <form id="formCreate">
                     <div class="modal-header">
-                        <h5 class="modal-title">Tambah Meja</h5>
+                        <h5 class="modal-title">Tambah Kategori</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
 
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="nama_meja">Nomor Meja (Wajib diisi)</label>
-                            <input type="text" name="nama_meja" class="form-control" placeholder="Masukkan nomor meja">
-                            <small class="text-danger error-nama_meja"></small>
+                            <label for="nama_kategori">Nama Kategori (Wajib diisi)</label>
+                            <input type="text" name="nama_kategori" class="form-control"
+                                placeholder="Masukkan nama kategori">
+                            <small class="text-danger error-nama_kategori"></small>
                         </div>
-                        <input type="hidden" name="qrcode_base64" id="qrcode_base64">
+
+                        <div class="mb-3">
+                            <label>Icon</label>
+                            <input type="file" name="icon" class="form-control" id="icon">
+                            <div class="mt-2">
+                                <img id="preview-icon" src="" alt="Preview"
+                                    style="max-width: 150px; display: none; border-radius: 8px;">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="modal-footer">
@@ -196,26 +154,32 @@
                     <input type="hidden" name="id" id="edit_id">
 
                     <div class="modal-header">
-                        <h5 class="modal-title">Edit Meja</h5>
+                        <h5 class="modal-title">Edit Kategori</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
 
                     <div class="modal-body">
 
                         <div class="mb-3">
-                            <label for="edit_nama_meja">Nomor Meja (Wajib diisi)</label>
-                            <input type="text" name="edit_nama_meja" class="form-control"
-                                placeholder="Masukkan nomor meja" id="edit_nama_meja">
-                            <small class="text-danger error-edit_nama_meja"></small>
+                            <label for="edit_nama_kategori">Nama Kategori (Wajib diisi)</label>
+                            <input type="text" id="edit_nama_kategori" name="edit_nama_kategori" class="form-control"
+                                placeholder="Masukkan nama kategori">
+                            <small class="text-danger error-edit_nama_kategori"></small>
                         </div>
-                        <input type="hidden" name="edit_qrcode_base64" id="edit_qrcode_base64">
 
-                    </div>
+                        <div class="mb-3">
+                            <label>Icon</label>
+                            <input type="file" name="edit_icon" class="form-control" id="edit_icon">
+                            <div class="mt-2">
+                                <img id="preview-edit_icon" src="" alt="Preview"
+                                    style="max-width: 150px; display: none; border-radius: 8px;">
+                            </div>
+                        </div>
 
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Update</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        </div>
                 </form>
             </div>
         </div>
@@ -224,5 +188,5 @@
 
 @section('own_script')
     <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-    <script src="{{ asset('own_assets/scripts/meja.js') }}"></script>
+    <script src="{{ asset('own_assets/scripts/kategori_menu.js') }}"></script>
 @endsection

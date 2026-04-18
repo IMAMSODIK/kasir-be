@@ -113,12 +113,12 @@ let tableTrash = $('#dataTableTrash').DataTable({
         render: function (data) {
             return `
                             <button class="btn btn-sm btn-primary restore-btn" data-id="${data}"><i class="fa fa-retweet" aria-hidden="true"></i></button>
-                            <button class="btn btn-sm btn-danger destroy-btn" data-id="${data}"><i class="fa fa-trash" aria-hidden="true"></i></button>
                         `;
         }
     }
     ]
 });
+{/* <button class="btn btn-sm btn-danger destroy-btn" data-id="${data}"><i class="fa fa-trash" aria-hidden="true"></i></button> */}
 
 $('#tambah-data').on('click', function () {
     $('#formCreate')[0].reset();
@@ -261,35 +261,35 @@ $('#formEdit').submit(function (e) {
         });
     });
 
-    $.ajax({
-        url: '/meja/update/' + id,
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function (res) {
-            if (res.success) {
-                $('#modalEdit').modal('hide');
+    // $.ajax({
+    //     url: '/meja/update/' + id,
+    //     type: 'POST',
+    //     data: formData,
+    //     processData: false,
+    //     contentType: false,
+    //     success: function (res) {
+    //         if (res.success) {
+    //             $('#modalEdit').modal('hide');
 
-                table.ajax.reload(null, false);
+    //             table.ajax.reload(null, false);
 
-                alertResult('success', 'Berhasil', res.message);
-            }
-        },
-        error: function (err) {
-            if (err.status === 422) {
-                let errors = err.responseJSON.errors;
+    //             alertResult('success', 'Berhasil', res.message);
+    //         }
+    //     },
+    //     error: function (err) {
+    //         if (err.status === 422) {
+    //             let errors = err.responseJSON.errors;
 
-                $.each(errors, function (key, value) {
-                    $('#formEdit .error-' + key).text(value[0]);
-                });
+    //             $.each(errors, function (key, value) {
+    //                 $('#formEdit .error-' + key).text(value[0]);
+    //             });
 
-                alertResult('warning', 'Validasi Gagal', 'Periksa kembali data');
-            } else {
-                alertResult('error', 'Error', 'Terjadi kesalahan server');
-            }
-        }
-    });
+    //             alertResult('warning', 'Validasi Gagal', 'Periksa kembali data');
+    //         } else {
+    //             alertResult('error', 'Error', 'Terjadi kesalahan server');
+    //         }
+    //     }
+    // });
 });
 
 $(document).on('click', '.delete-btn', function () {
@@ -306,7 +306,7 @@ $(document).on('click', '.delete-btn', function () {
         if (result.isConfirmed) {
 
             $.ajax({
-                url: '/users/delete/' + id,
+                url: '/meja/delete/' + id,
                 type: 'POST',
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content')
@@ -342,7 +342,7 @@ $(document).on('click', '.destroy-btn', function () {
         if (result.isConfirmed) {
 
             $.ajax({
-                url: '/users/destroy/' + id,
+                url: '/meja/destroy/' + id,
                 type: 'DELETE',
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content')
@@ -378,7 +378,7 @@ $(document).on('click', '.restore-btn', function () {
         if (result.isConfirmed) {
 
             $.ajax({
-                url: '/users/restore/' + id,
+                url: '/meja/restore/' + id,
                 type: 'POST',
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content')
@@ -408,3 +408,7 @@ $(".refresh-data").on("click", function () {
         tableTrash.ajax.reload(null, false);
     }
 })
+
+$('#download-data').click(function () {
+    window.open('/meja/download-qrcode', '_blank');
+});

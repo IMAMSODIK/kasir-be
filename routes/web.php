@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\KategoriMenuController;
 use App\Http\Controllers\MejaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -26,12 +27,22 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/meja', [MejaController::class, 'index']);
     Route::get('/meja/data', [MejaController::class, 'data']);
+    Route::get('/meja/download-qrcode', [MejaController::class, 'download']);
     Route::get('/meja/{id}', [MejaController::class, 'show']);
     Route::post('/meja/store', [MejaController::class, 'store']);
     Route::post('/meja/update/{id}', [MejaController::class, 'update']);
     Route::post('/meja/delete/{id}', [MejaController::class, 'deactivate']);
     Route::post('/meja/restore/{id}', [MejaController::class, 'restore']);
     Route::delete('/meja/destroy/{id}', [MejaController::class, 'destroy']);
+
+    Route::get('/kategori-menu', [KategoriMenuController::class, 'index']);
+    Route::get('/kategori-menu/data', [KategoriMenuController::class, 'data']);
+    Route::get('/kategori-menu/{id}', [KategoriMenuController::class, 'show']);
+    Route::post('/kategori-menu/store', [KategoriMenuController::class, 'store']);
+    Route::post('/kategori-menu/update/{id}', [KategoriMenuController::class, 'update']);
+    Route::post('/kategori-menu/delete/{id}', [KategoriMenuController::class, 'deactivate']);
+    Route::post('/kategori-menu/restore/{id}', [KategoriMenuController::class, 'restore']);
+    Route::delete('/kategori-menu/destroy/{id}', [KategoriMenuController::class, 'destroy']);
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
