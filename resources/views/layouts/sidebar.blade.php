@@ -46,35 +46,22 @@
                 @if (in_array(auth()->user()->role, ['admin', 'teacher']))
                     <li class="sidebar-main-title">
                         <div>
-                            <h6 class="">Data</h6>
+                            <h6 class="">Data Master</h6>
                         </div>
                     </li>
                 @endif
 
                 <li class="sidebar-list">
-                    <a class="sidebar-link sidebar-title link-nav" href="/units">
-                        <i class="fa fa-home text-white" aria-hidden="true"></i>
-                        <span>Units</span>
+                    <a class="sidebar-link sidebar-title link-nav" href="/users">
+                        <i class="fa fa-users text-white" aria-hidden="true"></i>
+                        <span>Users</span>
                     </a>
                 </li>
 
                 <li class="sidebar-list">
-                    <a class="sidebar-link sidebar-title link-nav" href="/snack">
-                        <i class="fa fa-home text-white" aria-hidden="true"></i>
-                        <span>Snack</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-main-title">
-                    <div>
-                        <h6 class="">Monitoring</h6>
-                    </div>
-                </li>
-
-                <li class="sidebar-list">
-                    <a class="sidebar-link sidebar-title link-nav" href="/billing">
-                        <i class="fa fa-home text-white" aria-hidden="true"></i>
-                        <span>Billing</span>
+                    <a class="sidebar-link sidebar-title link-nav" href="/meja">
+                        <i class="fa fa-square text-white" aria-hidden="true"></i>
+                        <span>Manajemen Meja</span>
                     </a>
                 </li>
 

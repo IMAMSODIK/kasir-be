@@ -40,6 +40,7 @@
 <!-- Theme js-->
 <script src="{{ asset('dashboard_assets/assets/js/script.js') }}"></script>
 <script src="{{ asset('dashboard_assets/assets/js/theme-customizer/customizer.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     new WOW().init();
@@ -64,6 +65,34 @@
     function closeModal(element) {
         element.modal("hide");
     }
+
+    function alertResult(status, title, message) {
+        if (status === 'error' || status === 'warning') {
+            Swal.fire({
+                icon: status,
+                title: title,
+                text: message,
+            });
+        } else {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: message,
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+    }
+
+    function slugify(text) {
+        return text
+            .toString()
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, '-')
+            .replace(/[^\w\-]+/g, '')
+            .replace(/\-\-+/g, '-');
+    }
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <script>
@@ -82,81 +111,34 @@
 
         return 'Rp. ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     }
-</script>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInputs = document.querySelectorAll('.page-search');
-        let lastKeyword = '';
+    $(document).on('change', 'input[type="file"]', function(e) {
+        let input = this;
+        let file = input.files[0];
 
-        // Sinkron input desktop & mobile
-        searchInputs.forEach(input => {
-            input.addEventListener('input', function() {
-                const value = this.value;
-                searchInputs.forEach(i => {
-                    if (i !== this) i.value = value;
-                });
-                performSearch(value);
-            });
-        });
+        if (!file) return;
 
-        function performSearch(keyword) {
-            clearHighlight();
+        let id = $(input).attr('id');
+        let preview = $('#preview-' + id);
 
-            if (!keyword || keyword.length < 2) return;
+        if (preview.length === 0) return;
 
-            const regex = new RegExp(`(${escapeRegExp(keyword)})`, 'gi');
-            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-
-            let firstMatch = null;
-
-            while (walker.nextNode()) {
-                const node = walker.currentNode;
-
-                if (
-                    node.parentNode.tagName === 'SCRIPT' ||
-                    node.parentNode.tagName === 'STYLE'
-                ) return;
-
-                if (regex.test(node.nodeValue)) {
-                    const span = document.createElement('span');
-                    span.innerHTML = node.nodeValue.replace(regex, '<span class="search-highlight">$1</span>');
-
-                    if (!firstMatch) {
-                        firstMatch = span.querySelector('.search-highlight');
-                    }
-
-                    node.parentNode.replaceChild(span, node);
-                }
-            }
-
-            if (firstMatch) {
-                firstMatch.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-            }
+        if (!file.type.startsWith('image/')) {
+            alert('File harus berupa gambar!');
+            $(input).val('');
+            preview.hide();
+            return;
         }
 
-        function clearHighlight() {
-            document.querySelectorAll('.search-highlight').forEach(el => {
-                el.replaceWith(document.createTextNode(el.textContent));
-            });
-        }
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            preview
+                .attr('src', e.target.result)
+                .show();
+        };
 
-        function escapeRegExp(string) {
-            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        }
-
-        document.addEventListener('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
-                e.preventDefault();
-                searchInputs[0].focus();
-            }
-        });
+        reader.readAsDataURL(file);
     });
 </script>
-
-<script src="{{ asset('dashboard_assets/assets/js/editors/quill.js') }}"></script>
 
 @yield('own_script')

@@ -3,7 +3,9 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\MejaController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -12,6 +14,24 @@ Route::get('/', function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
+
+    Route::get('/users', [UserController::class, 'index']);
+    Route::get('/users/data', [UserController::class, 'data']);
+    Route::get('/users/{id}', [UserController::class, 'show']);
+    Route::post('/users/store', [UserController::class, 'store']);
+    Route::post('/users/update/{id}', [UserController::class, 'update']);
+    Route::post('/users/delete/{id}', [UserController::class, 'deactivate']);
+    Route::post('/users/restore/{id}', [UserController::class, 'restore']);
+    Route::delete('/users/destroy/{id}', [UserController::class, 'destroy']);
+
+    Route::get('/meja', [MejaController::class, 'index']);
+    Route::get('/meja/data', [MejaController::class, 'data']);
+    Route::get('/meja/{id}', [MejaController::class, 'show']);
+    Route::post('/meja/store', [MejaController::class, 'store']);
+    Route::post('/meja/update/{id}', [MejaController::class, 'update']);
+    Route::post('/meja/delete/{id}', [MejaController::class, 'deactivate']);
+    Route::post('/meja/restore/{id}', [MejaController::class, 'restore']);
+    Route::delete('/meja/destroy/{id}', [MejaController::class, 'destroy']);
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
