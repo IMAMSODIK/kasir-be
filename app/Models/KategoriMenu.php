@@ -15,4 +15,9 @@ class KategoriMenu extends Model
         'status',
         'icon'
     ];
+
+    public function menus()
+    {
+        return $this->hasMany(Menu::class, 'kategori_menu_id');
+    }
 }

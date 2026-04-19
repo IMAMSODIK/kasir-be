@@ -15,6 +15,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call([
+            KategoriMenuSeeder::class
+        ]);
+
         User::create([
             'name' => 'Admin',
             'password' => bcrypt('12345'),

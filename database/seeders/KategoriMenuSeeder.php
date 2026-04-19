@@ -12,6 +12,14 @@ class KategoriMenuSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        $kategoriMenus = [
+            ['nama_kategori' => 'Makanan'],
+            ['nama_kategori' => 'Minuman'],
+            ['nama_kategori' => 'Cemilan'],
+        ];
+
+        foreach ($kategoriMenus as $kategori) {
+            \App\Models\KategoriMenu::create($kategori);
+        }
     }
 }

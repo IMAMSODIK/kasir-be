@@ -27,9 +27,8 @@
             <div class="page-body">
                 @yield('content')
             </div>
-
-            @include('layouts.footer')
         </div>
+        @include('layouts.footer')
     </div>
     
     @include('layouts.script')

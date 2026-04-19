@@ -108,8 +108,9 @@
 
     function formatRupiah(angka) {
         if (!angka) return 'Tidak ada data';
+        angka = Math.floor(angka);
 
-        return 'Rp. ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     }
 
     $(document).on('change', 'input[type="file"]', function(e) {

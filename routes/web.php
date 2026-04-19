@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\KategoriMenuController;
 use App\Http\Controllers\MejaController;
+use App\Http\Controllers\MenuController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -43,6 +44,17 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/kategori-menu/delete/{id}', [KategoriMenuController::class, 'deactivate']);
     Route::post('/kategori-menu/restore/{id}', [KategoriMenuController::class, 'restore']);
     Route::delete('/kategori-menu/destroy/{id}', [KategoriMenuController::class, 'destroy']);
+
+    Route::get('/daftar-menu', [MenuController::class, 'index']);
+    Route::get('/daftar-menu/data', [MenuController::class, 'data']);
+    Route::get('/daftar-menu/data-table', [MenuController::class, 'dataTable']);
+    Route::post('/daftar-menu/toggle-ready', [MenuController::class, 'toggleReady']);
+    Route::get('/daftar-menu/{id}', [MenuController::class, 'show']);
+    Route::post('/daftar-menu/store', [MenuController::class, 'store']);
+    Route::post('/daftar-menu/update', [MenuController::class, 'update']);
+    Route::post('/daftar-menu/delete/{id}', [MenuController::class, 'deactivate']);
+    Route::post('/daftar-menu/restore/{id}', [MenuController::class, 'restore']);
+    Route::delete('/daftar-menu/destroy/{id}', [MenuController::class, 'destroy']);
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

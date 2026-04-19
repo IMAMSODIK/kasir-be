@@ -1,0 +1,282 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Menu;
+use App\Http\Requests\StoreMenuRequest;
+use App\Http\Requests\UpdateMenuRequest;
+use App\Models\FotoMenu;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+
+class MenuController extends Controller
+{
+    public function index()
+    {
+        try {
+            $kategoriMenus = DB::table('kategori_menus')->where('status', true)->get();
+
+            return view('menu.index', [
+                'pageTitle' => 'Daftar Menu',
+                'kategoriMenus' => $kategoriMenus
+            ]);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal memuat halaman: ' . $e->getMessage());
+        }
+    }
+
+    public function data(Request $request)
+    {
+        try {
+
+            $query = Menu::with(['fotoMenus', 'kategoriMenu'])
+                ->where('status', $request->status ?? 1);
+
+            if ($request->has('kategori') && count($request->kategori) > 0) {
+                $query->whereIn('kategori_menu_id', $request->kategori);
+            }
+
+            if ($request->filled('is_ready')) {
+                $query->where('is_ready', $request->is_ready);
+            }
+
+            if ($request->filled('search')) {
+                $query->where('nama_menu', 'like', '%' . $request->search . '%');
+            }
+
+            $menu = $query
+                ->orderBy('is_ready', 'desc')
+                ->get();
+
+            return response()->json([
+                'data' => $menu
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Gagal mengambil data'
+            ], 500);
+        }
+    }
+
+    function dataTable(Request $request)
+    {
+        try {
+            $query = Menu::with('kategoriMenu')
+                ->where('status', $request->status ?? 1);
+
+            $menu = $query->get();
+
+            return response()->json([
+                'data' => $menu
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Gagal mengambil data'
+            ], 500);
+        }
+    }
+
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'nama_menu' => 'required|unique:menus,nama_menu',
+            'kategori_menu_id' => 'required|exists:kategori_menus,id',
+            'harga' => 'required|numeric',
+            'foto_menu' => 'required',
+            'foto_menu.*' => 'image|mimes:jpg,jpeg,png|max:2048',
+        ], [
+            'nama_menu.required' => 'Nama menu wajib diisi',
+            'nama_menu.unique' => 'Nama menu sudah ada',
+            'kategori_menu_id.required' => 'Kategori wajib dipilih',
+            'harga.required' => 'Harga wajib diisi',
+            'foto_menu.required' => 'Minimal 1 foto wajib diupload',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $menu = Menu::with(['kategoriMenu', 'fotoMenus'])->create([
+                'id' => Str::uuid(),
+                'nama_menu' => $request->nama_menu,
+                'kategori_menu_id' => $request->kategori_menu_id,
+                'harga' => $request->harga,
+                'deskripsi' => $request->deskripsi,
+                'status' => true,
+                'is_ready' => true,
+            ]);
+
+            if ($request->hasFile('foto_menu')) {
+                foreach ($request->file('foto_menu') as $file) {
+                    $path = $file->store('foto_menu', 'public');
+
+                    FotoMenu::create([
+                        'menu_id' => $menu->id,
+                        'foto_path' => $path
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            $menu->load(['kategoriMenu', 'fotoMenus']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Menu berhasil ditambahkan',
+                'data' => $menu
+            ]);
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menyimpan data' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function show($id)
+    {
+        try {
+            $menu = Menu::with(['fotoMenus', 'kategoriMenu'])->findOrFail($id);
+
+            return response()->json($menu);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Data tidak ditemukan'
+            ], 404);
+        }
+    }
+
+    public function update(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'edit_nama_menu' => 'required',
+            'edit_kategori_menu_id' => 'required',
+            'edit_harga' => 'required|numeric',
+            'edit_foto_menu.*' => 'image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $menu = Menu::findOrFail($request->id);
+
+            $menu->update([
+                'nama_menu' => $request->edit_nama_menu,
+                'kategori_menu_id' => $request->edit_kategori_menu_id,
+                'harga' => $request->edit_harga,
+                'deskripsi' => $request->edit_deskripsi,
+            ]);
+
+            if ($request->hasFile('edit_foto_menu')) {
+
+                foreach ($menu->fotoMenus as $foto) {
+                    Storage::disk('public')->delete($foto->foto_path);
+                }
+
+                $menu->fotoMenus()->delete();
+
+                foreach ($request->file('edit_foto_menu') as $file) {
+                    $path = $file->store('foto_menu', 'public');
+
+                    FotoMenu::create([
+                        'menu_id' => $menu->id,
+                        'foto_path' => $path
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            $menu->load(['fotoMenus', 'kategoriMenu']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Menu berhasil diupdate',
+                'data' => $menu
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'Gagal update' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function deactivate($id)
+    {
+        try {
+            $menu = Menu::findOrFail($id);
+            $menu->status = false;
+            $menu->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Menu berhasil dihapus'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus menu' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function restore($id)
+    {
+        try {
+            $menus = Menu::findOrFail($id);
+            $menus->status = true;
+            $menus->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil dikembalikan'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengembalikan data'
+            ], 500);
+        }
+    }
+
+    public function toggleReady(Request $request)
+    {
+        try {
+            $menu = Menu::findOrFail($request->id);
+
+            $menu->is_ready = !$menu->is_ready;
+            $menu->save();
+
+            return response()->json([
+                'success' => true,
+                'is_ready' => $menu->is_ready,
+                'message' => 'Status berhasil diubah'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal update status'
+            ], 500);
+        }
+    }
+}
