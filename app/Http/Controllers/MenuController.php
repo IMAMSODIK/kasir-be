@@ -61,6 +61,30 @@ class MenuController extends Controller
         }
     }
 
+    public function loadData(Request $request)
+    {
+        try {
+
+            $query = Menu::with(['fotoMenus', 'kategoriMenu'])
+                ->where('status', $request->status ?? 1)
+                ->where('is_ready', true);
+
+            if ($request->filled('kategori')) {
+                $query->where('kategori_menu_id', $request->kategori);
+            }
+
+            $menu = $query->get();
+
+            return response()->json([
+                'data' => $menu
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Gagal mengambil data'
+            ], 500);
+        }
+    }
+
     function dataTable(Request $request)
     {
         try {

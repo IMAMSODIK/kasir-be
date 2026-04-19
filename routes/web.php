@@ -11,8 +11,16 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    try {
+        $data = [
+            'kategori' => \App\Models\KategoriMenu::with('menus')->get(),
+        ];
+        return view('welcome', $data);
+    } catch (\Exception $e) {
+        return view('welcome', ['kategori' => []]);
+    }
 });
+Route::get('/daftar-menu/load-data', [MenuController::class, 'loadData']);
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
