@@ -9,16 +9,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="{{ asset('landing_assets/css/style.css') }}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
-    <style>
-        .tw * {
-    all: revert;
-}
-    </style>
 </head>
 
 <body class="bg-gray-50">
@@ -97,9 +90,8 @@
         <div class="container mx-auto px-4 mt-6">
             <h2 id="categoryTitle" class="text-xl font-bold text-gray-800 border-l-4 border-orange-500 pl-3 mb-4">
                 Makanan</h2>
-            <div class="tw">
-                <div id="menuList" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                </div>
+            <div id="menuList" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+
             </div>
         </div>
     </main>
@@ -140,35 +132,42 @@
     </div>
 
     <!-- MODAL CART -->
-    <div class="modal fade" id="modalCart" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content rounded-4">
+    <!-- OVERLAY -->
+    <div id="cartOverlay" class="fixed inset-0 bg-black/50 hidden z-40"></div>
 
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fas fa-bag-shopping"></i> Keranjang Belanja
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- MODAL -->
+    <div id="modalCart" class="fixed inset-0 flex items-center justify-center hidden z-50 px-4">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl overflow-hidden">
+
+            <!-- HEADER -->
+            <div class="flex justify-between items-center p-4 border-b">
+                <h5 class="font-semibold text-lg flex items-center gap-2">
+                    <i class="fas fa-bag-shopping"></i> Keranjang Belanja
+                </h5>
+                <button id="closeCartModal" class="text-gray-500 text-xl">&times;</button>
+            </div>
+
+            <!-- BODY -->
+            <div class="p-4 max-h-[60vh] overflow-y-auto">
+                <div id="cartList"></div>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="flex justify-between items-center p-4 border-t">
+                <div class="text-sm font-medium">
+                    Total: <span id="cartTotalFooter">Rp 0</span>
                 </div>
 
-                <div class="modal-body">
-                    <div id="cartList">
-                        <!-- Dynamic cart items akan dirender oleh JS -->
-                    </div>
-                </div>
-
-                <div class="modal-footer d-flex justify-content-between align-items-center">
-                    <div class="d-flex gap-3 align-items-center">
-                        <div class="cart-summary-text">
-                            <i class="fas fa-wallet me-1"></i> Total: <span id="cartTotalFooter">Rp 0</span>
-                        </div>
-                    </div>
-                    <div>
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                        <button class="btn btn-primary" id="checkoutBtn">Checkout</button>
-                    </div>
+                <div class="flex gap-2">
+                    <button id="closeCartBtn" class="px-4 py-2 bg-gray-200 rounded-lg">
+                        Tutup
+                    </button>
+                    <button id="checkoutBtn" class="px-4 py-2 bg-orange-500 text-white rounded-lg">
+                        Checkout
+                    </button>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -336,14 +335,28 @@
                 "extendedTimeOut": "1000"
             };
 
+            // buka modal
             $('#floatCartBtn').click(function() {
+
                 if (!cart.length) {
                     toastr.warning('Keranjang masih kosong');
                     return;
                 }
 
                 renderCart();
-                $('#modalCart').modal('show');
+
+                $('#modalCart').removeClass('hidden');
+                $('#cartOverlay').removeClass('hidden');
+            });
+
+            // close modal
+            function closeCartModal() {
+                $('#modalCart').addClass('hidden');
+                $('#cartOverlay').addClass('hidden');
+            }
+
+            $('#closeCartModal, #closeCartBtn, #cartOverlay').click(function() {
+                closeCartModal();
             });
 
             $('#menuToggleBtn').click(function() {
@@ -361,47 +374,54 @@
 
                 cart = cart.filter(i => i.id !== id);
 
-                // update badge kalau ada
                 updateCartBadge();
 
-                // ✅ kalau habis → langsung tutup modal
-                if (cart.length === 0) {
-                    $('#modalCart').modal('hide');
+                if (!cart.length) {
+                    closeCartModal(); // ✅ langsung close
                     return;
                 }
 
-                // kalau masih ada → render ulang
                 renderCart();
             });
 
             function renderCart() {
-                let html = '';
-                let total = 0;
 
-                cart.forEach(item => {
-                    let subtotal = item.harga * item.qty;
-                    total += subtotal;
+    let html = '';
+    let total = 0;
 
-                    html += `
-        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
-            <div>
-                <h6 class="mb-1">${item.nama}</h6>
-                <small>${item.qty} x Rp ${formatRupiah(item.harga)}</small>
+    cart.forEach(item => {
+
+        let subtotal = item.harga * item.qty;
+        total += subtotal;
+
+        html += `
+        <div class="flex justify-between items-center mb-3 border-b pb-3 hover:bg-gray-50 px-2 rounded-lg transition">
+
+            <div class="flex-1 pr-3">
+                <h6 class="font-semibold text-gray-800">${item.nama}</h6>
+                <p class="text-sm text-gray-500">
+                    ${item.qty} x Rp ${formatRupiah(item.harga)}
+                </p>
             </div>
 
-            <div class="d-flex align-items-center gap-2">
-                <strong>Rp ${formatRupiah(subtotal)}</strong>
-                <button class="btn btn-sm btn-danger btn-remove" data-id="${item.id}">
-                    <i class="fa fa-trash"></i>
+            <div class="flex items-center gap-3">
+                <span class="font-semibold text-orange-600">
+                    Rp ${formatRupiah(subtotal)}
+                </span>
+
+                <button class="btn-remove bg-red-100 hover:bg-red-500 text-red-500 hover:text-white transition w-8 h-8 flex items-center justify-center rounded-lg"
+                    data-id="${item.id}">
+                    <i class="fa fa-trash text-sm"></i>
                 </button>
             </div>
+
         </div>
         `;
-                });
+    });
 
-                $('#cartList').html(html);
-                $('#cartTotal').text('Rp ' + formatRupiah(total));
-            }
+    $('#cartList').html(html);
+    $('#cartTotalFooter').text('Rp ' + formatRupiah(total));
+}
 
 
             function updateCartBadge() {
