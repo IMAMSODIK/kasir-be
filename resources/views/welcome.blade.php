@@ -72,13 +72,13 @@
                 </button>
                 @foreach ($kategori as $kat)
                     <button
-                        class="tab-category px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 font-medium whitespace-nowrap transition hover:shadow flex items-center gap-2"
-                        data-cat="{{ $kat->id }}">
+    class="tab-category flex items-center gap-2 px-4 md:px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 font-medium whitespace-nowrap transition hover:shadow flex-shrink-0"
+    data-cat="{{ $kat->id }}">
 
-                        <img src="{{ asset('storage/' . $kat->icon) }}" class="w-5 h-5">
+    <img src="{{ asset('storage/' . $kat->icon) }}" class="w-5 h-5">
 
-                        <span>{{ $kat->nama_kategori }}</span>
-                    </button>
+    <span class="pr-1">{{ $kat->nama_kategori }}</span>
+</button>
                 @endforeach
             </div>
         </div>
