@@ -64,11 +64,20 @@
 
         <div class="container mx-auto px-4 mt-6">
             <div class="flex overflow-x-auto space-x-3 pb-2 no-scrollbar scroll-smooth" id="categoryTabs">
+                <button
+                    class="tab-category px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 font-medium whitespace-nowrap transition hover:shadow flex items-center gap-2"
+                    data-cat="0">
+                    <img src="{{ asset('own_assets/icon/all_kategori.png') }}" class="w-5 h-5">
+                    <span>Semua</span>
+                </button>
                 @foreach ($kategori as $kat)
                     <button
-                        class="tab-category px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 font-medium whitespace-nowrap transition hover:shadow"
+                        class="tab-category px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 font-medium whitespace-nowrap transition hover:shadow flex items-center gap-2"
                         data-cat="{{ $kat->id }}">
-                        {{ $kat->nama_kategori }}
+
+                        <img src="{{ asset('storage/' . $kat->icon) }}" class="w-5 h-5">
+
+                        <span>{{ $kat->nama_kategori }}</span>
                     </button>
                 @endforeach
             </div>
@@ -77,7 +86,7 @@
         <div class="container mx-auto px-4 mt-6">
             <h2 id="categoryTitle" class="text-xl font-bold text-gray-800 border-l-4 border-orange-500 pl-3 mb-4">
                 Makanan</h2>
-            <div id="menuList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div id="menuList" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
 
             </div>
         </div>
@@ -132,7 +141,7 @@
 
             if (firstTab.length) {
                 activeCategory = firstTab.data('cat');
-                firstTab.addClass('bg-orange-500 text-white');
+                firstTab.addClass('bg-orange-500 text-white active').removeClass('bg-white text-gray-700');
                 loadMenu(activeCategory);
                 $('#categoryTitle').text(firstTab.text());
             }
@@ -164,7 +173,7 @@
 
                     if (!res.data.length) {
                         $('#menuList').html(
-                        '<div class="text-center py-5 text-gray-400">Menu kosong</div>');
+                            '<div class="text-center py-5 text-gray-400">Menu kosong</div>');
                         return;
                     }
 

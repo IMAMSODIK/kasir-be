@@ -69,11 +69,11 @@ class MenuController extends Controller
                 ->where('status', $request->status ?? 1)
                 ->where('is_ready', true);
 
-            if ($request->filled('kategori')) {
-                $query->where('kategori_menu_id', $request->kategori);
+            if ($request->filled('kategori') && $request->kategori != '0') {
+                $menu = $query->where('kategori_menu_id', $request->kategori)->get();
+            }else{
+                $menu = $query->get();
             }
-
-            $menu = $query->get();
 
             return response()->json([
                 'data' => $menu
