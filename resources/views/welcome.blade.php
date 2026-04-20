@@ -65,20 +65,20 @@
         <div class="container mx-auto px-4 mt-6">
             <div class="flex overflow-x-auto space-x-3 pb-2 no-scrollbar scroll-smooth" id="categoryTabs">
                 <button
-                    class="tab-category px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 font-medium whitespace-nowrap transition hover:shadow flex items-center gap-2"
+                    class="tab-category flex items-center gap-2 px-4 md:px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 font-medium whitespace-nowrap transition hover:shadow flex-shrink-0"
                     data-cat="0">
                     <img src="{{ asset('own_assets/icon/all_kategori.png') }}" class="w-5 h-5">
                     <span>Semua</span>
                 </button>
                 @foreach ($kategori as $kat)
                     <button
-    class="tab-category flex items-center gap-2 px-4 md:px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 font-medium whitespace-nowrap transition hover:shadow flex-shrink-0"
-    data-cat="{{ $kat->id }}">
+                        class="tab-category flex items-center gap-2 px-4 md:px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 font-medium whitespace-nowrap transition hover:shadow flex-shrink-0"
+                        data-cat="{{ $kat->id }}">
 
-    <img src="{{ asset('storage/' . $kat->icon) }}" class="w-5 h-5">
+                        <img src="{{ asset('storage/' . $kat->icon) }}" class="w-5 h-5">
 
-    <span class="pr-1">{{ $kat->nama_kategori }}</span>
-</button>
+                        <span class="pr-1">{{ $kat->nama_kategori }}</span>
+                    </button>
                 @endforeach
             </div>
         </div>
@@ -188,22 +188,25 @@
                         }
 
                         html += `
-                <div class="menu-card bg-white rounded-2xl shadow hover:shadow-lg overflow-hidden transition">
-                    <img src="${img}" class="w-full h-36 object-cover">
-                    
-                    <div class="p-4">
-                        <h3 class="font-bold text-gray-800">${menu.nama_menu}</h3>
-                        <p class="text-orange-600 font-semibold mt-1">
-                            Rp ${formatRupiah(menu.harga)}
-                        </p>
+<div class="menu-card bg-white rounded-2xl shadow hover:shadow-lg overflow-hidden transition">
 
-                        <button class="btn-add mt-3 w-full bg-orange-100 hover:bg-orange-200 text-orange-700 py-2 rounded-xl"
-                            data-menu='${JSON.stringify(menu)}'>
-                            Pesan +
-                        </button>
-                    </div>
-                </div>
-                `;
+    <div class="w-full aspect-[1/1] overflow-hidden">
+        <img src="${img}" class="w-full h-full object-cover">
+    </div>
+
+    <div class="p-4">
+        <h3 class="font-bold text-gray-800">${menu.nama_menu}</h3>
+        <p class="text-orange-600 font-semibold mt-1">
+            Rp ${formatRupiah(menu.harga)}
+        </p>
+
+        <button class="btn-add mt-3 w-full bg-orange-100 hover:bg-orange-200 text-orange-700 py-2 rounded-xl"
+            data-menu='${JSON.stringify(menu)}'>
+            Pesan +
+        </button>
+    </div>
+</div>
+`;
                     });
 
                     $('#menuList').html(html);
