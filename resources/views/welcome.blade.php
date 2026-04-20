@@ -14,6 +14,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
+    <style>
+        .tw * {
+    all: revert;
+}
+    </style>
 </head>
 
 <body class="bg-gray-50">
@@ -92,8 +97,9 @@
         <div class="container mx-auto px-4 mt-6">
             <h2 id="categoryTitle" class="text-xl font-bold text-gray-800 border-l-4 border-orange-500 pl-3 mb-4">
                 Makanan</h2>
-            <div id="menuList" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1">
-
+            <div class="tw">
+                <div id="menuList" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                </div>
             </div>
         </div>
     </main>
@@ -406,7 +412,7 @@
                 });
 
                 if (total < 0) {
-                    total = 0;   
+                    total = 0;
                 }
 
                 $('#cartCountBadge').text(total);
