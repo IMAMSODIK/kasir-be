@@ -7,7 +7,13 @@
     <title>{{ config('app.name') }} - Order Page</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="{{ asset('landing_assets/css/style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 </head>
 
 <body class="bg-gray-50">
@@ -102,7 +108,7 @@
     <div id="sheetOverlay" class="sheet-overlay"></div>
     <div id="bottomSheet" class="bottom-sheet">
         <div class="sticky top-0 bg-white rounded-t-2xl border-b px-5 py-3 flex justify-between items-center">
-            <h3 class="font-bold text-lg">Tambah ke Keranjang</h3>
+            <h3 class="font-bold text-lg">Tambah Pesanan</h3>
             <button id="closeSheetBtn" class="text-gray-500 text-2xl"><i class="fas fa-times-circle"></i></button>
         </div>
         <div class="p-5">
@@ -123,11 +129,45 @@
             </div>
             <button id="addToCartBtn"
                 class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-2xl transition flex items-center justify-center gap-2"><i
-                    class="fas fa-cart-plus"></i> Masukkan ke Keranjang</button>
+                    class="fas fa-cart-plus"></i>Tambahkan Pesanan</button>
+        </div>
+    </div>
+
+    <!-- MODAL CART -->
+    <div class="modal fade" id="modalCart" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-bag-shopping"></i> Keranjang Belanja
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div id="cartList">
+                        <!-- Dynamic cart items akan dirender oleh JS -->
+                    </div>
+                </div>
+
+                <div class="modal-footer d-flex justify-content-between align-items-center">
+                    <div class="d-flex gap-3 align-items-center">
+                        <div class="cart-summary-text">
+                            <i class="fas fa-wallet me-1"></i> Total: <span id="cartTotalFooter">Rp 0</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button class="btn btn-primary" id="checkoutBtn">Checkout</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function() {
@@ -188,25 +228,25 @@
                         }
 
                         html += `
-<div class="menu-card bg-white rounded-2xl shadow hover:shadow-lg overflow-hidden transition">
+                            <div class="menu-card bg-white rounded-2xl shadow hover:shadow-lg overflow-hidden transition">
 
-    <div class="w-full aspect-[1/1] overflow-hidden">
-        <img src="${img}" class="w-full h-full object-cover">
-    </div>
+                                <div class="w-full aspect-[1/1] overflow-hidden">
+                                    <img src="${img}" class="w-full h-full object-cover">
+                                </div>
 
-    <div class="p-4">
-        <h3 class="font-bold text-gray-800">${menu.nama_menu}</h3>
-        <p class="text-orange-600 font-semibold mt-1">
-            Rp ${formatRupiah(menu.harga)}
-        </p>
+                                <div class="p-4">
+                                    <h3 class="font-bold text-gray-800">${menu.nama_menu}</h3>
+                                    <p class="text-orange-600 font-semibold mt-1">
+                                        Rp ${formatRupiah(menu.harga)}
+                                    </p>
 
-        <button class="btn-add mt-3 w-full bg-orange-100 hover:bg-orange-200 text-orange-700 py-2 rounded-xl"
-            data-menu='${JSON.stringify(menu)}'>
-            Pesan +
-        </button>
-    </div>
-</div>
-`;
+                                    <button class="btn-add mt-3 w-full bg-orange-100 hover:bg-orange-200 text-orange-700 py-2 rounded-xl"
+                                        data-menu='${JSON.stringify(menu)}'>
+                                        Pesan +
+                                    </button>
+                                </div>
+                            </div>
+                            `;
                     });
 
                     $('#menuList').html(html);
@@ -259,7 +299,6 @@
             });
 
             $('#addToCartBtn').click(function() {
-
                 let exist = cart.find(i => i.id === selectedMenu.id);
 
                 if (exist) {
@@ -283,20 +322,22 @@
                 $('#cartCountBadge').text(total);
             }
 
-            $('#floatCartBtn').click(function() {
+            toastr.options = {
+                "closeButton": false,
+                "progressBar": true,
+                "positionClass": "toast-bottom-right",
+                "timeOut": "2000",
+                "extendedTimeOut": "1000"
+            };
 
+            $('#floatCartBtn').click(function() {
                 if (!cart.length) {
-                    alert('Keranjang kosong');
+                    toastr.warning('Keranjang masih kosong');
                     return;
                 }
 
-                let text = '🛒 Keranjang:\n\n';
-
-                cart.forEach(i => {
-                    text += `${i.nama} x${i.qty}\n`;
-                });
-
-                alert(text);
+                renderCart();
+                $('#modalCart').modal('show');
             });
 
             $('#menuToggleBtn').click(function() {
@@ -308,6 +349,69 @@
                 $('#sidebar').removeClass('open');
                 $('#overlay').removeClass('active');
             });
+
+            $(document).on('click', '.btn-remove', function() {
+                let id = $(this).data('id');
+
+                cart = cart.filter(i => i.id !== id);
+
+                // update badge kalau ada
+                updateCartBadge();
+
+                // ✅ kalau habis → langsung tutup modal
+                if (cart.length === 0) {
+                    $('#modalCart').modal('hide');
+                    return;
+                }
+
+                // kalau masih ada → render ulang
+                renderCart();
+            });
+
+            function renderCart() {
+                let html = '';
+                let total = 0;
+
+                cart.forEach(item => {
+                    let subtotal = item.harga * item.qty;
+                    total += subtotal;
+
+                    html += `
+        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+            <div>
+                <h6 class="mb-1">${item.nama}</h6>
+                <small>${item.qty} x Rp ${formatRupiah(item.harga)}</small>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <strong>Rp ${formatRupiah(subtotal)}</strong>
+                <button class="btn btn-sm btn-danger btn-remove" data-id="${item.id}">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
+        </div>
+        `;
+                });
+
+                $('#cartList').html(html);
+                $('#cartTotal').text('Rp ' + formatRupiah(total));
+            }
+
+
+            function updateCartBadge() {
+                let total = 0;
+
+                cart.forEach(item => {
+                    total += item.qty;
+                });
+
+                if (total < 0) {
+                    total = 0;   
+                }
+
+                $('#cartCountBadge').text(total);
+                $('#cartCountBadge').show();
+            }
 
             function formatRupiah(angka) {
                 return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
