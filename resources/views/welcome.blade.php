@@ -92,7 +92,7 @@
         <div class="container mx-auto px-4 mt-6">
             <h2 id="categoryTitle" class="text-xl font-bold text-gray-800 border-l-4 border-orange-500 pl-3 mb-4">
                 Makanan</h2>
-            <div id="menuList" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div id="menuList" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1">
 
             </div>
         </div>
