@@ -225,33 +225,36 @@
             $('#paymentModal').addClass('hidden').removeClass('flex');
         }
 
-        function startCheckStatus() {
+        function startCheckingStatus(orderId) {
 
-            if (intervalCheck) {
-                clearInterval(intervalCheck);
-            }
+            if (checkInterval) clearInterval(checkInterval);
 
-            intervalCheck = setInterval(() => {
+            checkInterval = setInterval(() => {
 
-                if (!orderIdGlobal) return;
+                $.get(`/order/status/${orderId}`, function(res) {
 
-                $.get('/order/status/' + orderIdGlobal, function(res) {
+                    console.log('status:', res.status);
 
                     if (res.status === 'paid') {
-                        clearInterval(intervalCheck);
-                        showPaymentPopup('success');
+
+                        clearInterval(checkInterval);
+                        showStatusPopup('success', 'Pembayaran berhasil');
+
                         cart = [];
-                        updateCartBadge();
+                        updateCart();
+
+                        setTimeout(() => location.reload(), 1500);
                     }
 
-                    if (['deny', 'cancelled', 'expired'].includes(res.status)) {
-                        clearInterval(intervalCheck);
-                        showPaymentPopup('failed');
+                    if (res.status === 'failed' || res.status === 'deny' || res.status === 'cancelled') {
+
+                        clearInterval(checkInterval);
+                        showStatusPopup('error', 'Pembayaran gagal');
                     }
 
                 });
 
-            }, 3000);
+            }, 2000); // ⏱ tiap 2 detik
         }
 
         $(document).ready(function() {
@@ -604,17 +607,18 @@
 
                         orderIdGlobal = res.order_id;
 
-                        // 🔥 mulai polling
-                        startCheckStatus();
-
                         snap.pay(res.snap_token, {
-
                             onSuccess: function() {
-                                // biarkan polling yang handle
+                                // tutup popup snap
+                                snap.hide();
+                                showPaymentPopup('success');
+
+                                cart = [];
+                                updateCartBadge();
                             },
 
                             onPending: function() {
-                                showPaymentPopup('pending');
+                                startCheckingStatus(res.order_id);
                             },
 
                             onError: function() {
