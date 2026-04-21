@@ -190,12 +190,78 @@
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}">
     </script>
     <script>
+        function showPaymentPopup(type) {
+
+            let icon = '';
+            let title = '';
+            let desc = '';
+
+            if (type === 'success') {
+                icon = '<i class="fas fa-circle-check text-green-500"></i>';
+                title = 'Pembayaran Berhasil';
+                desc = 'Pesanan kamu sedang diproses';
+            }
+
+            if (type === 'failed') {
+                icon = '<i class="fas fa-circle-xmark text-red-500"></i>';
+                title = 'Pembayaran Gagal';
+                desc = 'Silakan coba lagi';
+            }
+
+            if (type === 'pending') {
+                icon = '<i class="fas fa-clock text-yellow-500"></i>';
+                title = 'Menunggu Pembayaran';
+                desc = 'Selesaikan pembayaran kamu';
+            }
+
+            $('#paymentIcon').html(icon);
+            $('#paymentTitle').text(title);
+            $('#paymentDesc').text(desc);
+
+            $('#paymentModal').removeClass('hidden').addClass('flex');
+        }
+
+        function closePaymentModal() {
+            $('#paymentModal').addClass('hidden').removeClass('flex');
+        }
+
+        function startCheckStatus() {
+
+            if (intervalCheck) {
+                clearInterval(intervalCheck);
+            }
+
+            intervalCheck = setInterval(() => {
+
+                if (!orderIdGlobal) return;
+
+                $.get('/order/status/' + orderIdGlobal, function(res) {
+
+                    if (res.status === 'paid') {
+                        clearInterval(intervalCheck);
+                        showPaymentPopup('success');
+                        cart = [];
+                        updateCartBadge();
+                    }
+
+                    if (['deny', 'cancelled', 'expired'].includes(res.status)) {
+                        clearInterval(intervalCheck);
+                        showPaymentPopup('failed');
+                    }
+
+                });
+
+            }, 3000);
+        }
+
         $(document).ready(function() {
 
             let activeCategory = null;
             let cart = [];
             let selectedMenu = null;
             let qty = 1;
+            let orderIdGlobal = null;
+            let intervalCheck = null;
 
             let firstTab = $('.tab-category').first();
 
@@ -535,24 +601,28 @@
                         items: items
                     },
                     success: function(res) {
+
+                        orderIdGlobal = res.order_id;
+
+                        // 🔥 mulai polling
+                        startCheckStatus();
+
                         snap.pay(res.snap_token, {
 
-                            onSuccess: function(result) {
-                                toastr.success('Pembayaran berhasil');
-                                cart = [];
-                                location.reload();
+                            onSuccess: function() {
+                                // biarkan polling yang handle
                             },
 
-                            onPending: function(result) {
-                                toastr.info('Menunggu pembayaran');
+                            onPending: function() {
+                                showPaymentPopup('pending');
                             },
 
-                            onError: function(result) {
-                                toastr.error('Pembayaran gagal');
+                            onError: function() {
+                                showPaymentPopup('failed');
                             },
 
                             onClose: function() {
-                                console.log('User menutup popup');
+                                console.log('popup ditutup');
                             }
                         });
 
