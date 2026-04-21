@@ -14,6 +14,7 @@ class OrderController extends Controller
 {
     public function checkout(Request $request)
     {
+        dd(config('midtrans.server_key'));
         $request->validate([
             'items' => 'required|array|min:1',
             'items.*.id' => 'required',
