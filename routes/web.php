@@ -24,6 +24,7 @@ Route::get('/', function () {
 Route::get('/daftar-menu/load-data', [MenuController::class, 'loadData']);
 
 Route::post('/checkout', [OrderController::class, 'checkout']);
+Route::get('/order/status/{orderId}', [OrderController::class, 'checkStatus']);
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);

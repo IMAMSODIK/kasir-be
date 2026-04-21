@@ -112,4 +112,17 @@ class OrderController extends Controller
             ], 500);
         }
     }
+    
+    public function checkStatus($orderId)
+    {
+        $order = Order::where('order_id', $orderId)->first();
+
+        if (!$order) {
+            return response()->json(['status' => 'not_found']);
+        }
+
+        return response()->json([
+            'status' => $order->status
+        ]);
+    }
 }

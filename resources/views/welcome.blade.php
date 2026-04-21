@@ -172,10 +172,23 @@
         </div>
     </div>
 
+    <div id="paymentModal" class="fixed inset-0 hidden items-center justify-center bg-black/50 z-50">
+        <div class="bg-white rounded-2xl p-6 w-80 text-center animate-scale">
+            <div id="paymentIcon" class="text-5xl mb-3"></div>
+            <h3 id="paymentTitle" class="text-xl font-bold mb-2"></h3>
+            <p id="paymentDesc" class="text-gray-500 mb-4"></p>
+
+            <button onclick="closePaymentModal()" class="w-full bg-orange-500 text-white py-2 rounded-xl">
+                OK
+            </button>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}">
+    </script>
     <script>
         $(document).ready(function() {
 
@@ -522,7 +535,6 @@
                         items: items
                     },
                     success: function(res) {
-
                         snap.pay(res.snap_token, {
 
                             onSuccess: function(result) {
