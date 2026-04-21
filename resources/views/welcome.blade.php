@@ -233,28 +233,28 @@
 
                 $.get(`/order/status/${orderId}`, function(res) {
 
-                    console.log('status:', res.status);
-
                     if (res.status === 'paid') {
 
                         clearInterval(checkInterval);
-                        showStatusPopup('success', 'Pembayaran berhasil');
+
+                        showPaymentPopup('success');
 
                         cart = [];
-                        updateCart();
+                        updateCartBadge();
 
                         setTimeout(() => location.reload(), 1500);
                     }
 
-                    if (res.status === 'failed' || res.status === 'deny' || res.status === 'cancelled') {
+                    if (['failed', 'deny', 'cancelled', 'expired'].includes(res.status)) {
 
                         clearInterval(checkInterval);
-                        showStatusPopup('error', 'Pembayaran gagal');
+
+                        showPaymentPopup('failed');
                     }
 
                 });
 
-            }, 2000); // ⏱ tiap 2 detik
+            }, 2000);
         }
 
         $(document).ready(function() {
@@ -608,16 +608,10 @@
                         orderIdGlobal = res.order_id;
 
                         snap.pay(res.snap_token, {
-                            onSuccess: function() {
-                                // tutup popup snap
-                                snap.hide();
-                                showPaymentPopup('success');
-
-                                cart = [];
-                                updateCartBadge();
-                            },
+                            onSuccess: function() {},
 
                             onPending: function() {
+                                showPaymentPopup('pending');
                                 startCheckingStatus(res.order_id);
                             },
 
