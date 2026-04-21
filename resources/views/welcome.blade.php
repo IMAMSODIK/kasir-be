@@ -313,7 +313,8 @@
                         id: selectedMenu.id,
                         nama: selectedMenu.nama_menu,
                         harga: selectedMenu.harga,
-                        qty: qty
+                        qty: qty,
+                        note: ''
                     });
                 }
 
@@ -377,7 +378,7 @@
                 updateCartBadge();
 
                 if (!cart.length) {
-                    closeCartModal(); // ✅ langsung close
+                    closeCartModal();
                     return;
                 }
 
@@ -386,43 +387,68 @@
 
             function renderCart() {
 
-    let html = '';
-    let total = 0;
+                let html = '';
+                let total = 0;
 
-    cart.forEach(item => {
+                cart.forEach(item => {
 
-        let subtotal = item.harga * item.qty;
-        total += subtotal;
+                    let subtotal = item.harga * item.qty;
+                    total += subtotal;
 
-        html += `
-        <div class="flex justify-between items-center mb-3 border-b pb-3 hover:bg-gray-50 px-2 rounded-lg transition">
+                    html += `
+                        <div class="border-b pb-4 mb-4">
 
-            <div class="flex-1 pr-3">
-                <h6 class="font-semibold text-gray-800">${item.nama}</h6>
-                <p class="text-sm text-gray-500">
-                    ${item.qty} x Rp ${formatRupiah(item.harga)}
-                </p>
-            </div>
+                            <div class="flex justify-between items-start">
 
-            <div class="flex items-center gap-3">
-                <span class="font-semibold text-orange-600">
-                    Rp ${formatRupiah(subtotal)}
-                </span>
+                                <div class="flex-1 pr-3">
+                                    <h6 class="font-semibold text-gray-800">${item.nama}</h6>
 
-                <button class="btn-remove bg-red-100 hover:bg-red-500 text-red-500 hover:text-white transition w-8 h-8 flex items-center justify-center rounded-lg"
-                    data-id="${item.id}">
-                    <i class="fa fa-trash text-sm"></i>
-                </button>
-            </div>
+                                    <p class="text-sm text-gray-500">
+                                        Rp ${formatRupiah(item.harga)}
+                                    </p>
 
-        </div>
-        `;
-    });
+                                    <!-- NOTE -->
+                                    <input type="text"
+                                        class="mt-2 w-full border rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 note-input"
+                                        placeholder="Tambah catatan..."
+                                        data-id="${item.id}"
+                                        value="${item.note ?? ''}">
+                                </div>
 
-    $('#cartList').html(html);
-    $('#cartTotalFooter').text('Rp ' + formatRupiah(total));
-}
+                                <div class="flex flex-col items-end gap-2">
 
+                                    <!-- HARGA -->
+                                    <span class="font-semibold text-orange-600">
+                                        Rp ${formatRupiah(subtotal)}
+                                    </span>
+
+                                    <!-- QTY CONTROL -->
+                                    <div class="flex items-center gap-2 bg-gray-100 rounded-lg px-2 py-1">
+
+                                        <button class="qty-minus text-lg px-2" data-id="${item.id}">-</button>
+
+                                        <span class="w-6 text-center">${item.qty}</span>
+
+                                        <button class="qty-plus text-lg px-2" data-id="${item.id}">+</button>
+
+                                    </div>
+
+                                    <!-- DELETE -->
+                                    <button class="btn-remove text-red-500 text-sm" data-id="${item.id}">
+                                        Hapus
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                        `;
+                });
+
+                $('#cartList').html(html);
+                $('#cartTotalFooter').text('Rp ' + formatRupiah(total));
+            }
 
             function updateCartBadge() {
                 let total = 0;
@@ -442,6 +468,37 @@
             function formatRupiah(angka) {
                 return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
             }
+
+            $(document).on('click', '.qty-plus', function() {
+                let id = $(this).data('id');
+
+                let item = cart.find(i => i.id === id);
+                item.qty++;
+
+                renderCart();
+                updateCartBadge();
+            });
+
+            $(document).on('click', '.qty-minus', function() {
+                let id = $(this).data('id');
+
+                let item = cart.find(i => i.id === id);
+
+                if (item.qty > 1) {
+                    item.qty--;
+                }
+
+                renderCart();
+                updateCartBadge();
+            });
+
+            $(document).on('input', '.note-input', function() {
+                let id = $(this).data('id');
+                let value = $(this).val();
+
+                let item = cart.find(i => i.id === id);
+                item.note = value;
+            });
 
         });
     </script>
