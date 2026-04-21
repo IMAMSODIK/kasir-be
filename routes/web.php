@@ -6,6 +6,7 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\KategoriMenuController;
 use App\Http\Controllers\MejaController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,8 @@ Route::get('/', function () {
     }
 });
 Route::get('/daftar-menu/load-data', [MenuController::class, 'loadData']);
+
+Route::post('/checkout', [OrderController::class, 'checkout']);
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);

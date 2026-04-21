@@ -407,7 +407,6 @@
                                         Rp ${formatRupiah(item.harga)}
                                     </p>
 
-                                    <!-- NOTE -->
                                     <input type="text"
                                         class="mt-2 w-full border rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 note-input"
                                         placeholder="Tambah catatan..."
@@ -501,6 +500,59 @@
             });
 
         });
+    </script>
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js"
+    data-client-key="{{ config('midtrans.client_key') }}"></script>
+    <script>
+        $('#checkoutBtn').click(function() {
+
+    if (!cart.length) {
+        toastr.warning('Keranjang kosong');
+        return;
+    }
+
+    let items = cart.map(i => ({
+        id: i.id,
+        qty: i.qty,
+        note: i.note
+    }));
+
+    $.ajax({
+        url: '/checkout',
+        method: 'POST',
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            items: items
+        },
+        success: function(res) {
+
+            snap.pay(res.snap_token, {
+
+                onSuccess: function(result) {
+                    toastr.success('Pembayaran berhasil');
+                    cart = [];
+                    location.reload();
+                },
+
+                onPending: function(result) {
+                    toastr.info('Menunggu pembayaran');
+                },
+
+                onError: function(result) {
+                    toastr.error('Pembayaran gagal');
+                },
+
+                onClose: function() {
+                    console.log('User menutup popup');
+                }
+            });
+
+        },
+        error: function() {
+            toastr.error('Checkout gagal');
+        }
+    });
+});
     </script>
     <style>
         .no-scrollbar::-webkit-scrollbar {
