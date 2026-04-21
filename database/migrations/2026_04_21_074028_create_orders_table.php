@@ -13,6 +13,29 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->string('order_id')->unique();
+
+            // CUSTOMER (optional)
+            $table->string('customer_name')->nullable();
+            $table->string('customer_phone')->nullable();
+
+            // TOTAL
+            $table->decimal('total_amount', 15, 2);
+
+            // STATUS ORDER
+            $table->enum('status', [
+                'pending',
+                'paid',
+                'challenge',
+                'deny',
+                'expired',
+                'cancelled'
+            ])->default('pending');
+
+            // MIDTRANS RESPONSE
+            $table->string('payment_type')->nullable();
+            $table->string('transaction_id')->nullable();
+            $table->string('fraud_status')->nullable();
             $table->timestamps();
         });
     }
