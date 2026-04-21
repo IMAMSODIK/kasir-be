@@ -10,10 +10,8 @@ class Order extends Model
     /** @use HasFactory<\Database\Factories\OrderFactory> */
     use HasFactory;
 
-    protected $fillable = [
-        'order_id',
-        'gross_amount',
-        'snap_token',
+    protected $guarded = [
+        'id'
     ];
 
     public function items()
