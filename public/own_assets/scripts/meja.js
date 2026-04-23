@@ -214,7 +214,7 @@ $('#formEdit').submit(function (e) {
         return;
     }
 
-    QRCode.toDataURL(slug, function (err, url) {
+    QRCode.toDataURL($('meta[name="app-url"]').attr('content') + '?table=' + slug, function (err, url) {
         if (err) {
             alertResult('error', 'Error', 'Gagal generate QR');
             return;
