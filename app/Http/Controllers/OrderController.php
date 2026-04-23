@@ -35,20 +35,18 @@ class OrderController extends Controller
 
             $grossAmount = 0;
             $itemDetails = [];
-
-            // 🔹 generate order id
             $orderId = 'ORDER-' . Str::uuid();
 
-            // 🔹 simpan order dulu
             $order = Order::create([
                 'order_id' => $orderId,
-                'total_amount' => 0, // nanti di update
-                'status' => 'pending'
+                'total_amount' => 0,
+                'status' => 'pending',
+                'customer_table' => $request->customer_table,
             ]);
 
             foreach ($request->items as $item) {
 
-                $menu = Menu::findOrFail($item['id']); // 🔐 ambil dari DB
+                $menu = Menu::findOrFail($item['id']);
 
                 $price = (int) $menu->harga;
                 $qty = (int) $item['qty'];
@@ -56,7 +54,6 @@ class OrderController extends Controller
                 $subtotal = $price * $qty;
                 $grossAmount += $subtotal;
 
-                // 🔹 simpan item
                 OrderItem::create([
                     'order_id' => $order->id,
                     'menu_id' => $menu->id,

@@ -601,7 +601,8 @@
                     method: 'POST',
                     data: {
                         _token: $('meta[name="csrf-token"]').attr('content'),
-                        items: items
+                        items: items,
+                        customer_table: '{{ request()->query('table') ?? '' }}'
                     },
                     success: function(res) {
 
