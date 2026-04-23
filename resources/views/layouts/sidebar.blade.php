@@ -43,13 +43,11 @@
                     </a>
                 </li>
 
-                @if (in_array(auth()->user()->role, ['admin', 'teacher']))
-                    <li class="sidebar-main-title">
-                        <div>
-                            <h6 class="">Data Master</h6>
-                        </div>
-                    </li>
-                @endif
+                <li class="sidebar-main-title">
+                    <div>
+                        <h6 class="">Data Master</h6>
+                    </div>
+                </li>
 
                 <li class="sidebar-list">
                     <a class="sidebar-link sidebar-title link-nav" href="/users">
@@ -74,6 +72,31 @@
                     <ul class="sidebar-submenu" style="display: none;">
                         <li><a href="/kategori-menu"><i class="fa fa-list me-2"></i> Kategori Menu</a></li>
                         <li><a href="/daftar-menu"><i class="fa fa-cutlery me-2" aria-hidden="true"></i> Daftar Menu</a></li>
+                    </ul>
+                </li>
+
+                <li class="sidebar-main-title">
+                    <div>
+                        <h6 class="">Data Penjualan</h6>
+                    </div>
+                </li>
+
+                <li class="sidebar-list">
+                    <a class="sidebar-link sidebar-title link-nav" href="/statistik-penjualan">
+                        <i class="fa fa-line-chart text-white" aria-hidden="true"></i>
+                        <span>Statistik Penjualan</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-list" style="cursor: pointer">
+                    <a class="sidebar-link sidebar-title">
+                        <i class="fa fa-shopping-cart text-white"></i>
+                        <span class="">Order</span>
+                        <div class="according-menu"><i class="fa fa-angle-right"></i></div>
+                    </a>
+                    <ul class="sidebar-submenu" style="display: none;">
+                        <li><a href="/daftar-order"><i class="fa fa-shopping-cart text-white me-2"></i> Daftar Order</a></li>
+                        <li><a href="/riwayat-order"><i class="fa fa-history text-white me-2"></i> Riwayat Order</a></li>
                     </ul>
                 </li>
 

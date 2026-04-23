@@ -4,18 +4,31 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
+
     public function index()
     {
         $data = [
             'pageTitle' => 'Dashboard'
         ];
-
         try {
+            $sales = DB::table('orders')
+                ->select(
+                    DB::raw('DATE(created_at) as date'),
+                    DB::raw('SUM(total_amount) as total')
+                )
+                ->where('status', 'paid')
+                ->groupBy('date')
+                ->orderBy('date')
+                ->get();
 
-            return view('dashboard.index', $data);
+            $labels = $sales->pluck('date');
+            $data = $sales->pluck('total');
+
+            return view('dashboard', compact('labels', 'data', 'pageTitle'));
         } catch (Exception $e) {
             return redirect('/dashboard')->with('error', $e->getMessage());
         }

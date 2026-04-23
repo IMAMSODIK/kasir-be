@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained()->cascadeOnDelete();
             $table->uuid('menu_id');
 
-            $table->string('nama_menu'); // snapshot (biar aman kalau nama berubah)
+            $table->string('nama_menu');
             $table->decimal('harga', 15, 2);
             $table->integer('qty');
 

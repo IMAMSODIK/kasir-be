@@ -8,6 +8,7 @@ use App\Http\Controllers\MejaController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StatistikController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -67,6 +68,16 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/daftar-menu/delete/{id}', [MenuController::class, 'deactivate']);
     Route::post('/daftar-menu/restore/{id}', [MenuController::class, 'restore']);
     Route::delete('/daftar-menu/destroy/{id}', [MenuController::class, 'destroy']);
+
+    Route::get('/statistik-penjualan', [StatistikController::class, 'index']);
+    Route::get('/statistik-penjualan/data', [StatistikController::class, 'data']);
+    Route::get('/statistik-penjualan/download-qrcode', [StatistikController::class, 'download']);
+    Route::get('/statistik-penjualan/{id}', [StatistikController::class, 'show']);
+    Route::post('/statistik-penjualan/store', [StatistikController::class, 'store']);
+    Route::post('/statistik-penjualan/update/{id}', [StatistikController::class, 'update']);
+    Route::post('/statistik-penjualan/delete/{id}', [StatistikController::class, 'deactivate']);
+    Route::post('/statistik-penjualan/restore/{id}', [StatistikController::class, 'restore']);
+    Route::delete('/statistik-penjualan/destroy/{id}', [StatistikController::class, 'destroy']);
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

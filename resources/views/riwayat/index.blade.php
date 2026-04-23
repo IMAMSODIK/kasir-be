@@ -224,5 +224,5 @@
 
 @section('own_script')
     <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-    <script src="{{ asset('own_assets/scripts/riwayat.js') }}"></script>
+    <script src="{{ asset('own_assets/scripts/meja.js') }}"></script>
 @endsection
