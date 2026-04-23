@@ -25,7 +25,6 @@ class DashboardController extends Controller
 
             $labels = $sales->pluck('date');
             $data = $sales->pluck('total');
-            dd($data);
 
             return view('dashboard', compact('labels', 'data', 'pageTitle'));
         } catch (Exception $e) {
