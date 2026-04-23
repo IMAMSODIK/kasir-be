@@ -70,7 +70,7 @@ class MejaController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan saat menyimpan data'
+                'message' => 'Terjadi kesalahan saat menyimpan data' . $e->getMessage()
             ], 500);
         }
     }
