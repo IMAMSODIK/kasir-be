@@ -13,6 +13,7 @@ class DashboardController extends Controller
     {
         try {
             $pageTitle = 'Dashboard';
+            dd($pageTitle);
             $sales = DB::table('orders')
                 ->select(
                     DB::raw('DATE(created_at) as date'),
