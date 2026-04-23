@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Meja;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -41,7 +42,7 @@ class OrderController extends Controller
                 'order_id' => $orderId,
                 'total_amount' => 0,
                 'status' => 'pending',
-                'customer_table' => $request->customer_table,
+                'meja_id' => $request->customer_table ? Meja::where('slug', $request->customer_table)->first()->id : null,
             ]);
 
             foreach ($request->items as $item) {

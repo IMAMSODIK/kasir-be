@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('order_id')->unique();
 
             // CUSTOMER (optional)
-            $table->string('customer_table')->nullable();
+            $table->foreignId('meja_id')->nullable();
             $table->string('customer_name')->nullable();
             $table->string('customer_phone')->nullable();
 
