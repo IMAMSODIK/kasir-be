@@ -26,10 +26,9 @@ class DashboardController extends Controller
             $labels = $sales->pluck('date');
             $data = $sales->pluck('total');
 
-            return view('dashboard', compact('labels', 'data', 'pageTitle'));
+            return view('dashboard.index', compact('labels', 'data', 'pageTitle'));
         } catch (Exception $e) {
-            dd($e->getMessage());
-            return redirect('/dashboard')->with('error', $e->getMessage());
+            return back()->with('error', $e->getMessage());
         }
     }
 }
