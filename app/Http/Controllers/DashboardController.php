@@ -13,7 +13,6 @@ class DashboardController extends Controller
     {
         try {
             $pageTitle = 'Dashboard';
-            dd($pageTitle);
             $sales = DB::table('orders')
                 ->select(
                     DB::raw('DATE(created_at) as date'),
@@ -26,6 +25,7 @@ class DashboardController extends Controller
 
             $labels = $sales->pluck('date');
             $data = $sales->pluck('total');
+            dd($data);
 
             return view('dashboard', compact('labels', 'data', 'pageTitle'));
         } catch (Exception $e) {
