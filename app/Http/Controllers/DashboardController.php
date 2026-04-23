@@ -28,6 +28,7 @@ class DashboardController extends Controller
 
             return view('dashboard', compact('labels', 'data', 'pageTitle'));
         } catch (Exception $e) {
+            dd($e->getMessage());
             return redirect('/dashboard')->with('error', $e->getMessage());
         }
     }
