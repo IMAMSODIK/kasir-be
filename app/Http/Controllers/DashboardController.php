@@ -11,10 +11,8 @@ class DashboardController extends Controller
 
     public function index()
     {
-        $data = [
-            'pageTitle' => 'Dashboard'
-        ];
         try {
+            $pageTitle = 'Dashboard';
             $sales = DB::table('orders')
                 ->select(
                     DB::raw('DATE(created_at) as date'),
