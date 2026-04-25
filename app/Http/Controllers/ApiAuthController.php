@@ -46,4 +46,32 @@ class ApiAuthController extends Controller
             'message' => 'Logout berhasil'
         ]);
     }
+
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'photo' => 'nullable|image|max:2048'
+        ]);
+
+        // update basic data
+        $user->name = $request->name;
+        $user->email = $request->email;
+
+        // handle upload foto
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('users', 'public');
+            $user->foto = $path;
+        }
+
+        $user->save();
+
+        return response()->json([
+            'message' => 'Profile berhasil diupdate',
+            'user' => $user
+        ]);
+    }
 }
