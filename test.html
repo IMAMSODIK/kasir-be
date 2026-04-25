@@ -1,110 +1,253 @@
-<div id="overlay" class="overlay fixed inset-0 bg-black/50"></div>
+<script>
+        // ---------- DATA MENU ----------
+        const categories = [
+            { id: "makanan", name: "🍚 Makanan" },
+            { id: "minuman", name: "🥤 Minuman" },
+            { id: "snack", name: "🍟 Snack" }
+        ];
 
-    <aside id="sidebar" class="sidebar fixed top-0 left-0 w-72 h-full bg-white shadow-2xl z-50 flex flex-col">
-        <div class="p-5 border-b flex justify-between items-center">
-            <h2 class="text-xl font-bold text-orange-600">
-                <img src="{{ asset('own_assets/logo/logo.png') }}" width="50%">
-            </h2>
-            <button id="closeSidebarBtn" class="text-gray-500 text-2xl"><i class="fas fa-times"></i></button>
-        </div>
-        <nav class="flex-1 p-4 space-y-3">
-            <a href="#" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-orange-50 transition"><i
-                    class="fas fa-home w-6 text-orange-500"></i><span>Beranda</span></a>
-            <a href="#" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-orange-50 transition"><i
-                    class="fas fa-history w-6 text-orange-500"></i><span>Pesanan</span></a>
-        </nav>
-        <div class="p-5 border-t bg-gray-50">
-            <h3 class="font-semibold text-gray-700 mb-3"><i class="fas fa-address-card mr-2"></i>Kontak Kami</h3>
-            <div class="space-y-2 text-sm text-gray-600">
-                <p><i class="fab fa-whatsapp w-5 text-green-600"></i> +62 812-3456-7890</p>
-                <p><i class="fas fa-phone-alt w-5 text-blue-500"></i> (021) 1234 5678</p>
-                <p><i class="fas fa-envelope w-5 text-red-400"></i> halo@restoran.id</p>
-                <p><i class="fas fa-map-marker-alt w-5 text-gray-600"></i> Jl. Kuliner No. 88, Jakarta</p>
-            </div>
-            <div class="flex mt-4 space-x-3">
-                <i class="fab fa-instagram text-2xl text-pink-500"></i>
-                <i class="fab fa-facebook text-2xl text-blue-700"></i>
-                <i class="fab fa-tiktok text-2xl text-black"></i>
-            </div>
-        </div>
-    </aside>
+        const menuData = {
+            makanan: [
+                { id: 1, name: "Nasi Goreng Spesial", price: 28000, image: "https://picsum.photos/id/30/200/150", category: "makanan" },
+                { id: 2, name: "Ayam Bakar Madu", price: 35000, image: "https://picsum.photos/id/127/200/150", category: "makanan" },
+                { id: 3, name: "Sate Ayam Lontong", price: 32000, image: "https://picsum.photos/id/108/200/150", category: "makanan" }
+            ],
+            minuman: [
+                { id: 4, name: "Es Teh Manis", price: 8000, image: "https://picsum.photos/id/29/200/150", category: "minuman" },
+                { id: 5, name: "Jus Alpukat", price: 18000, image: "https://picsum.photos/id/34/200/150", category: "minuman" },
+                { id: 6, name: "Lemon Tea", price: 12000, image: "https://picsum.photos/id/31/200/150", category: "minuman" }
+            ],
+            snack: [
+                { id: 7, name: "Pisang Goreng Crispy", price: 15000, image: "https://picsum.photos/id/115/200/150", category: "snack" },
+                { id: 8, name: "Kentang Goreng", price: 18000, image: "https://picsum.photos/id/97/200/150", category: "snack" },
+                { id: 9, name: "Lumpia Udang", price: 22000, image: "https://picsum.photos/id/131/200/150", category: "snack" }
+            ]
+        };
 
-    <main class="pb-28">
-        <header class="bg-white shadow-sm sticky top-0 z-20">
-            <div class="container mx-auto px-4 py-4 flex items-center gap-4">
-                <button id="menuToggleBtn" class="text-2xl text-orange-600 focus:outline-none">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="text-xl font-bold text-gray-800">
-                    <img src="{{ asset('own_assets/logo/logo.png') }}" width="50%">
-                </h1>
-            </div>
-        </header>
+        // State keranjang: array { id, name, price, quantity, image }
+        let cart = [];
 
-        <div class="container mx-auto px-4 mt-4">
-            <div class="w-full h-40 md:h-56 rounded-2xl overflow-hidden shadow-md">
-                <img src="https://picsum.photos/id/106/1200/400" alt="Banner Makanan"
-                    class="w-full h-full object-cover">
-            </div>
-        </div>
+        // State bottom sheet: menu yang dipilih
+        let selectedMenuItem = null;
+        let currentQty = 1;
 
-        <div class="container mx-auto px-4 mt-6">
-            <div class="flex overflow-x-auto space-x-3 pb-2 no-scrollbar scroll-smooth" id="categoryTabs">
-                @foreach ($kategori as $kat)
-                    <button
-                        class="tab-category px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 font-medium whitespace-nowrap transition hover:shadow"
-                        data-cat="{{ $kat->id }}">
-                        {{ $kat->nama_kategori }}
-                    </button>
-                @endforeach
-            </div>
-        </div>
+        // DOM elements
+        const categoryTabsDiv = document.getElementById("categoryTabs");
+        const menuListDiv = document.getElementById("menuList");
+        const categoryTitleSpan = document.getElementById("categoryTitle");
+        const cartCountSpan = document.getElementById("cartCountBadge");
+        const floatCartBtn = document.getElementById("floatCartBtn");
+        const bottomSheet = document.getElementById("bottomSheet");
+        const sheetOverlay = document.getElementById("sheetOverlay");
+        const closeSheetBtn = document.getElementById("closeSheetBtn");
+        const addToCartBtn = document.getElementById("addToCartBtn");
+        const qtyMinus = document.getElementById("qtyMinus");
+        const qtyPlus = document.getElementById("qtyPlus");
+        const qtyValueSpan = document.getElementById("qtyValue");
+        const sheetMenuImg = document.getElementById("sheetMenuImg");
+        const sheetMenuName = document.getElementById("sheetMenuName");
+        const sheetMenuPrice = document.getElementById("sheetMenuPrice");
 
-        <div class="container mx-auto px-4 mt-6">
-            <h2 id="categoryTitle" class="text-xl font-bold text-gray-800 border-l-4 border-orange-500 pl-3 mb-4">
-                Makanan</h2>
-            <div id="menuList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        // Sidebar elements
+        const sidebar = document.getElementById("sidebar");
+        const overlayDiv = document.getElementById("overlay");
+        const menuToggleBtn = document.getElementById("menuToggleBtn");
+        const closeSidebarBtn = document.getElementById("closeSidebarBtn");
 
-            </div>
-        </div>
-    </main>
+        // Fungsi update badge keranjang
+        function updateCartBadge() {
+            let totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCountSpan.innerText = totalItems;
+            // animasi sederhana
+            if(totalItems > 0) {
+                floatCartBtn.classList.add("ring-2", "ring-yellow-300");
+            } else {
+                floatCartBtn.classList.remove("ring-2", "ring-yellow-300");
+            }
+        }
 
-    <!-- FLOATING CART BUTTON -->
-    <div id="floatCartBtn" class="float-cart">
-        <i class="fas fa-shopping-bag text-2xl"></i>
-        <span id="cartCountBadge">0</span>
-    </div>
-
-    <!-- BOTTOM SHEET OVERLAY & SHEET -->
-    <div id="sheetOverlay" class="sheet-overlay"></div>
-    <div id="bottomSheet" class="bottom-sheet">
-        <div class="sticky top-0 bg-white rounded-t-2xl border-b px-5 py-3 flex justify-between items-center">
-            <h3 class="font-bold text-lg">Tambah ke Keranjang</h3>
-            <button id="closeSheetBtn" class="text-gray-500 text-2xl"><i class="fas fa-times-circle"></i></button>
-        </div>
-        <div class="p-5">
-            <div class="flex items-center gap-4 mb-4">
-                <img id="sheetMenuImg" src="" alt="preview"
-                    class="w-16 h-16 rounded-xl object-cover bg-gray-100">
-                <div>
-                    <h4 id="sheetMenuName" class="font-bold text-gray-800">Nama Menu</h4>
-                    <p id="sheetMenuPrice" class="text-orange-600 font-semibold">Rp 0</p>
+        // Render menu berdasarkan kategori
+        function renderMenusByCategory(categoryId) {
+            const menus = menuData[categoryId] || [];
+            if (menus.length === 0) {
+                menuListDiv.innerHTML = `<div class="col-span-full text-center py-10 text-gray-400">Belum ada menu di kategori ini</div>`;
+                return;
+            }
+            menuListDiv.innerHTML = menus.map(menu => `
+                <div class="menu-card bg-white rounded-2xl shadow hover:shadow-lg overflow-hidden transition cursor-pointer" data-menu='${JSON.stringify(menu)}'>
+                    <img src="${menu.image}" alt="${menu.name}" class="w-full h-36 object-cover">
+                    <div class="p-4">
+                        <h3 class="font-bold text-gray-800">${menu.name}</h3>
+                        <p class="text-orange-600 font-semibold mt-1">Rp ${menu.price.toLocaleString('id-ID')}</p>
+                        <button class="mt-3 w-full bg-orange-100 hover:bg-orange-200 text-orange-700 py-2 rounded-xl text-sm font-medium transition add-menu-trigger">Pesan +</button>
+                    </div>
                 </div>
-            </div>
-            <div class="flex items-center justify-between bg-gray-100 rounded-full p-2 mb-6">
-                <button id="qtyMinus"
-                    class="w-10 h-10 rounded-full bg-white shadow text-xl font-bold text-gray-700">-</button>
-                <span id="qtyValue" class="text-xl font-semibold w-12 text-center">1</span>
-                <button id="qtyPlus"
-                    class="w-10 h-10 rounded-full bg-white shadow text-xl font-bold text-gray-700">+</button>
-            </div>
-            <button id="addToCartBtn"
-                class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-2xl transition flex items-center justify-center gap-2"><i
-                    class="fas fa-cart-plus"></i> Masukkan ke Keranjang</button>
-        </div>
-    </div>
+            `).join('');
 
-jangan ubah stylenya
-buatkan pakai bootstrap
+            // Pasang event listener ke setiap card dan tombol pesan
+            document.querySelectorAll('.menu-card').forEach(card => {
+                const menuDataAttr = card.getAttribute('data-menu');
+                if (menuDataAttr) {
+                    const menu = JSON.parse(menuDataAttr);
+                    const btn = card.querySelector('.add-menu-trigger');
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openBottomSheet(menu);
+                    });
+                    // klik pada card juga bisa membuka (opsional)
+                    card.addEventListener('click', (e) => {
+                        if (e.target.classList.contains('add-menu-trigger')) return;
+                        openBottomSheet(menu);
+                    });
+                }
+            });
+        }
 
-dan buatkan alur menggunakan jquery
+        // Buka bottom sheet dengan data menu
+        function openBottomSheet(menu) {
+            selectedMenuItem = menu;
+            currentQty = 1;
+            qtyValueSpan.innerText = currentQty;
+            sheetMenuName.innerText = menu.name;
+            sheetMenuPrice.innerText = `Rp ${menu.price.toLocaleString('id-ID')}`;
+            sheetMenuImg.src = menu.image;
+            bottomSheet.classList.add("open");
+            sheetOverlay.classList.add("active");
+            document.body.style.overflow = "hidden";
+        }
+
+        function closeBottomSheet() {
+            bottomSheet.classList.remove("open");
+            sheetOverlay.classList.remove("active");
+            document.body.style.overflow = "";
+            selectedMenuItem = null;
+        }
+
+        // masukkan ke keranjang (update atau tambah)
+        function addToCartFunction() {
+            if (!selectedMenuItem) return;
+            const existingIndex = cart.findIndex(item => item.id === selectedMenuItem.id);
+            if (existingIndex !== -1) {
+                cart[existingIndex].quantity += currentQty;
+            } else {
+                cart.push({
+                    id: selectedMenuItem.id,
+                    name: selectedMenuItem.name,
+                    price: selectedMenuItem.price,
+                    quantity: currentQty,
+                    image: selectedMenuItem.image
+                });
+            }
+            updateCartBadge();
+            // feedback visual kecil (toast sederhana)
+            showToast(`${selectedMenuItem.name} ditambahkan (${currentQty})`, "success");
+            closeBottomSheet();
+        }
+
+        // toast sederhana
+        function showToast(msg, type = "success") {
+            let toast = document.createElement("div");
+            toast.className = "fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-5 py-2 rounded-full shadow-lg z-50 text-sm flex items-center gap-2";
+            toast.innerHTML = `<i class="fas fa-check-circle text-green-400"></i> ${msg}`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = "0";
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        // Klik floating cart: tampilkan alert/ringkasan sederhana (bisa diubah jadi modal)
+        floatCartBtn.addEventListener("click", () => {
+            if (cart.length === 0) {
+                showToast("Keranjang masih kosong nih!", "info");
+                return;
+            }
+            let totalItem = cart.reduce((sum,i) => sum + i.quantity,0);
+            let totalPrice = cart.reduce((sum,i) => sum + (i.price * i.quantity),0);
+            let listItems = cart.map(i => `${i.name} x${i.quantity} = Rp ${(i.price * i.quantity).toLocaleString('id-ID')}`).join("\n");
+            alert(`🛒 Isi Keranjang:\n${listItems}\n\nTotal item: ${totalItem}\nTotal harga: Rp ${totalPrice.toLocaleString('id-ID')}\n\n(Kamu bisa lihat pesananmu di sini, demo sederhana)`);
+        });
+
+        // event bottom sheet controls
+        qtyPlus.addEventListener("click", () => {
+            currentQty++;
+            qtyValueSpan.innerText = currentQty;
+        });
+        qtyMinus.addEventListener("click", () => {
+            if (currentQty > 1) {
+                currentQty--;
+                qtyValueSpan.innerText = currentQty;
+            }
+        });
+        addToCartBtn.addEventListener("click", addToCartFunction);
+        closeSheetBtn.addEventListener("click", closeBottomSheet);
+        sheetOverlay.addEventListener("click", closeBottomSheet);
+
+        // Render tab kategori dinamis & set active
+        let activeCategory = "makanan";
+
+        function renderTabs() {
+            categoryTabsDiv.innerHTML = categories.map(cat => `
+                <button class="tab-category px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 font-medium whitespace-nowrap transition hover:shadow ${activeCategory === cat.id ? 'tab-active border-orange-500 bg-orange-500 text-white' : ''}" data-cat="${cat.id}">
+                    ${cat.name}
+                </button>
+            `).join('');
+            // Pasang listener tiap tab
+            document.querySelectorAll('.tab-category').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const catId = btn.getAttribute('data-cat');
+                    if (!catId) return;
+                    activeCategory = catId;
+                    // Update tampilan tab aktif
+                    document.querySelectorAll('.tab-category').forEach(b => {
+                        if (b.getAttribute('data-cat') === activeCategory) {
+                            b.classList.add('tab-active', 'bg-orange-500', 'text-white');
+                            b.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
+                        } else {
+                            b.classList.remove('tab-active', 'bg-orange-500', 'text-white');
+                            b.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
+                        }
+                    });
+                    // ganti title kategori
+                    const foundCat = categories.find(c => c.id === activeCategory);
+                    categoryTitleSpan.innerText = foundCat ? foundCat.name : "Menu";
+                    // render menu sesuai kategori
+                    renderMenusByCategory(activeCategory);
+                });
+            });
+        }
+
+        // set default
+        function init() {
+            renderTabs();
+            categoryTitleSpan.innerText = "Makanan";
+            renderMenusByCategory("makanan");
+            updateCartBadge();
+            // sidebar control
+            const openSidebar = () => {
+                sidebar.classList.add("open");
+                overlayDiv.classList.add("active");
+                document.body.style.overflow = "hidden";
+            };
+            const closeSidebar = () => {
+                sidebar.classList.remove("open");
+                overlayDiv.classList.remove("active");
+                document.body.style.overflow = "";
+            };
+            menuToggleBtn.addEventListener("click", openSidebar);
+            closeSidebarBtn.addEventListener("click", closeSidebar);
+            overlayDiv.addEventListener("click", closeSidebar);
+            // tambahan untuk navigasi internal: jika klik pada sidebar link bisa close
+            document.querySelectorAll('#sidebar nav a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    closeSidebar();
+                    showToast("Navigasi tersedia (demo)", "info");
+                });
+            });
+        }
+
+        init();
+    </script>
+
+simplekan kodenya karna saya pakai laravel untuk mengambil datanya

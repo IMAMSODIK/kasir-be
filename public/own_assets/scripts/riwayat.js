@@ -8,52 +8,20 @@ $.ajaxSetup({
 let table = $('#dataTable').DataTable({
     processing: true,
     ajax: {
-        url: '/meja/data',
+        url: '/statistik-penjualan/data',
         dataSrc: 'data',
         data: function (d) {
             d.status = 1;
         }
     },
     columnDefs: [{
-        targets: [0, 2, 3, 4],
+        targets: [0, 2],
         className: 'text-center'
     }],
     columns: [{
         data: null,
         render: function (data, type, row, meta) {
             return meta.row + 1;
-        }
-    },
-    {
-        data: 'nama_meja'
-    },
-    {
-        data: 'status',
-        render: function (data) {
-            return data ?
-                '<span class="badge bg-success">Active</span>' :
-                '<span class="badge bg-secondary">Inactive</span>';
-        }
-    },
-    {
-        data: 'qrcode',
-        render: function (data) {
-            if (data) {
-                let url = `/storage/${data}`;
-
-                return `
-                    <div class="d-flex justify-content-center">
-                        <div class="qr-wrapper">
-                            <img src="${url}" class="qr-img">
-                            <a href="${url}" download class="qr-download">
-                                <i class="fa fa-download"></i>
-                            </a>
-                        </div>
-                    </div>
-                `;
-            } else {
-                return '<span class="text-muted">No QR Code</span>';
-            }
         }
     },
     {

@@ -1,6 +1,14 @@
 <?php
 
+use App\Http\Controllers\ApiAuthController;
 use App\Http\Controllers\MidtransController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/midtrans/callback', [MidtransController::class, 'callback']);
+
+Route::post('/login', [ApiAuthController::class, 'login']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/me', [ApiAuthController::class, 'me']);
+    Route::post('/logout', [ApiAuthController::class, 'logout']);
+});

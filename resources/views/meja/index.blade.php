@@ -99,12 +99,6 @@
                         <div class="row">
                             <div class="col-md-12 mb-2">
                                 <div class="d-flex justify-content-end">
-                                    <button class="btn btn-secondary" id="download-data" style="margin-right: 5px">
-                                        <i class="fa fa-download me-2" aria-hidden="true"></i> Download QRCode
-                                    </button>
-                                    <button class="btn btn-primary" id="tambah-data" style="margin-right: 5px">
-                                        <i class="fa fa-plus-circle me-2"></i> Tambah Data
-                                    </button>
                                     <button class="btn btn-info refresh-data" data-table="data" style="margin-right: 5px">
                                         <i class="fa fa-refresh me-2" aria-hidden="true"></i> Refresh Data
                                     </button>
@@ -117,9 +111,6 @@
                                     <thead>
                                         <tr class="text-center">
                                             <th>No</th>
-                                            <th>Nomor Meja</th>
-                                            <th>Status</th>
-                                            <th>QRCode</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
@@ -147,9 +138,6 @@
                                     <thead>
                                         <tr class="text-center">
                                             <th>No</th>
-                                            <th>Nomor Meja</th>
-                                            <th>Status</th>
-                                            <th>QRCode</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
