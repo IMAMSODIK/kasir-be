@@ -81,7 +81,8 @@ class ApiAuthController extends Controller
     {
         $request->validate([
             'old_password' => 'required',
-            'password' => 'required|min:6|confirmed',
+            'new_password' => 'required|min:5',
+            'confirm_password' => 'required|min:5',
         ]);
 
         $user = auth()->user();
@@ -89,6 +90,12 @@ class ApiAuthController extends Controller
         if (!Hash::check($request->old_password, $user->password)) {
             return response()->json([
                 'message' => 'Password lama salah'
+            ], 400);
+        }
+
+        if ($request->new_password != $request->confirm_password) {
+            return response()->json([
+                'message' => 'Password tidak sama'
             ], 400);
         }
 
