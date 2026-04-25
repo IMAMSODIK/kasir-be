@@ -65,6 +65,8 @@ class ApiAuthController extends Controller
         if ($request->hasFile('photo')) {
             $path = $request->file('photo')->store('users', 'public');
             $user->foto = $path;
+        }else{
+            $user->foto = null;
         }
 
         $user->save();
