@@ -65,7 +65,7 @@ class ApiAuthController extends Controller
         if ($request->hasFile('photo')) {
             $path = $request->file('photo')->store('users', 'public');
             $user->foto = $path;
-        }else{
+        } else {
             $user->foto = null;
         }
 
@@ -74,6 +74,29 @@ class ApiAuthController extends Controller
         return response()->json([
             'message' => 'Profile berhasil diupdate',
             'user' => $user
+        ]);
+    }
+
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'old_password' => 'required',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        $user = auth()->user();
+
+        if (!Hash::check($request->old_password, $user->password)) {
+            return response()->json([
+                'message' => 'Password lama salah'
+            ], 400);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return response()->json([
+            'message' => 'Password berhasil diubah'
         ]);
     }
 }
