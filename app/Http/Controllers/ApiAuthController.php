@@ -87,19 +87,22 @@ class ApiAuthController extends Controller
 
         $user = auth()->user();
 
+        // cek password lama
         if (!Hash::check($request->old_password, $user->password)) {
             return response()->json([
                 'message' => 'Password lama salah'
             ], 400);
         }
 
-        if ($request->new_password != $request->confirm_password) {
+        // cek password baru sama
+        if ($request->new_password !== $request->confirm_password) {
             return response()->json([
                 'message' => 'Password tidak sama'
             ], 400);
         }
 
-        $user->password = Hash::make($request->password);
+        // ❗ FIX UTAMA DI SINI
+        $user->password = Hash::make($request->new_password);
         $user->save();
 
         return response()->json([
